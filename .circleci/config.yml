@@ -35,7 +35,7 @@ jobs:
 
    - deploy:
        command: |
-         if [ "${CIRCLE_PROJECT_USERNAME}" == "твой-username" ] && [ "${CIRCLE_BRANCH}" == "master" ]; then
+         if [ "${CIRCLE_PROJECT_USERNAME}" == "pap0gallo" ] && [ "${CIRCLE_BRANCH}" == "master" ]; then
            echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
            go install --ldflags '-extldflags "-static"' \
            github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
