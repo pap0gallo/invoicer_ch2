@@ -43,7 +43,7 @@ jobs:
           echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
 
       - name: Build Docker image
-        if: github.repository_owner == 'pap0gallo' && github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         run: |
           docker build -t ${DOCKER_REPO}/${{ github.event.repository.name }} .
 
