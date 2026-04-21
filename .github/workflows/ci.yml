@@ -1,0 +1,53 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ master ]  # если у тебя master, иначе поменяй на main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Set variables (аналог Setup environment)
+        run: |
+          if [ "${{ github.repository_owner }}" == "Securing-DevOps" ]; then
+            echo "DOCKER_REPO=securingdevops" >> $GITHUB_ENV
+          else
+            echo "DOCKER_REPO=${DOCKER_USER}" >> $GITHUB_ENV
+          fi
+
+      - name: Test application
+        run: |
+          go test ./...
+
+      - name: Build binary
+        run: |
+          go build -ldflags '-extldflags "-static"' -o bin/invoicer
+
+      - name: Docker login
+        if: github.repository_owner == 'pap0gallo' && github.ref == 'refs/heads/master'
+        run: |
+          echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+
+      - name: Build Docker image
+        if: github.repository_owner == 'pap0gallo' && github.ref == 'refs/heads/master'
+        run: |
+          docker build -t ${DOCKER_REPO}/${{ github.event.repository.name }} .
+
+      - name: Push Docker image
+        if: github.repository_owner == 'pap0gallo' && github.ref == 'refs/heads/master'
+        run: |
+          docker push ${DOCKER_REPO}/${{ github.event.repository.name }}
