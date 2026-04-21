@@ -38,7 +38,7 @@ jobs:
           go build -ldflags '-extldflags "-static"' -o bin/invoicer
 
       - name: Docker login
-        if: github.repository_owner == 'pap0gallo' && github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         run: |
           echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
 
@@ -48,6 +48,6 @@ jobs:
           docker build -t ${DOCKER_REPO}/${{ github.event.repository.name }} .
 
       - name: Push Docker image
-        if: github.repository_owner == 'pap0gallo' && github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         run: |
           docker push ${DOCKER_REPO}/${{ github.event.repository.name }}
